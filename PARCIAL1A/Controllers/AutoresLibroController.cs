@@ -7,11 +7,11 @@ namespace PARCIAL1A.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AutorLibroLibroController : ControllerBase
+    public class AutorLibroController : ControllerBase
     {
         private readonly ParcialContext _ParcialContexto;
 
-        public AutorLibroLibroController(ParcialContext ParcialContexto)
+        public AutorLibroController(ParcialContext ParcialContexto)
         {
             _ParcialContexto = ParcialContexto;
         }

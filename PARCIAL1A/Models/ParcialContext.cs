@@ -13,10 +13,6 @@ namespace PARCIAL1A.Models
         public DbSet<post> Posts { get; set; }
         public DbSet<libro> Libros { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<autorlibro>().HasNoKey();
-        }
     } 
 }
 
