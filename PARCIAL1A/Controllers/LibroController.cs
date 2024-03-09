@@ -36,8 +36,8 @@ namespace PARCIAL1A.Controllers
         public IActionResult GetById(int id)
         {
             libro? libro = (from e in _ParcialContexto.Libros
-                          where e.Id == id
-                          select e).FirstOrDefault();
+                            where e.Id == id
+                            select e).FirstOrDefault();
             if (libro == null)
             {
                 return NotFound();
@@ -66,8 +66,8 @@ namespace PARCIAL1A.Controllers
         public IActionResult Update(int id, [FromBody] libro libroModificar)
         {
             libro? libroActual = (from e in _ParcialContexto.Libros
-                            where e.Id == id
-                            select e).FirstOrDefault();
+                                  where e.Id == id
+                                  select e).FirstOrDefault();
             if (libroActual == null)
             {
                 return NotFound();
@@ -96,6 +96,34 @@ namespace PARCIAL1A.Controllers
             _ParcialContexto.SaveChanges();
 
             return Ok(libro);
+
+
+        }
+        [HttpGet]
+        [Route("BuscarPorAutor/{nombreAutor}")]
+        public IActionResult BuscarPorAutor(string nombreAutor)
+        {
+            List<libro> librosDelAutor = _ParcialContexto.Libros
+                .Join(_ParcialContexto.AutorLibro,
+                      libro => libro.Id,
+                      autorLibro => autorLibro.LibroId,
+                      (libro, autorLibro) => new { Libro = libro, AutorLibro = autorLibro })
+                .Join(_ParcialContexto.Autores,
+                      combined => combined.AutorLibro.AutorId,
+                      autor => autor.Id,
+                      (combined, autor) => new { combined.Libro, Autor = autor })
+                .Where(result => result.Autor.Nombre == nombreAutor)
+                .Select(result => result.Libro)
+                .ToList();
+
+            if (librosDelAutor.Count() == 0)
+            {
+                return NotFound("No se encontraron libros para el autor especificado.");
+            }
+
+            return Ok(librosDelAutor);
         }
     }
 }
+
+  
