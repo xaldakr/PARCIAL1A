@@ -35,7 +35,9 @@ namespace PARCIAL1A.Controllers
         [Route("GetById/{id}")]
         public IActionResult GetById(int id)
         {
-            libro libro = _ParcialContexto.Libros.Find(id);
+            libro? libro = (from e in _ParcialContexto.Libros
+                          where e.Id == id
+                          select e).FirstOrDefault();
             if (libro == null)
             {
                 return NotFound();
@@ -63,7 +65,9 @@ namespace PARCIAL1A.Controllers
         [Route("Update/{id}")]
         public IActionResult Update(int id, [FromBody] libro libroModificar)
         {
-            libro libroActual = _ParcialContexto.Libros.Find(id);
+            libro? libroActual = (from e in _ParcialContexto.Libros
+                            where e.Id == id
+                            select e).FirstOrDefault();
             if (libroActual == null)
             {
                 return NotFound();
@@ -80,7 +84,9 @@ namespace PARCIAL1A.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(int id)
         {
-            libro libro = _ParcialContexto.Libros.Find(id);
+            libro? libro = (from e in _ParcialContexto.Libros
+                            where e.Id == id
+                            select e).FirstOrDefault();
             if (libro == null)
             {
                 return NotFound();
