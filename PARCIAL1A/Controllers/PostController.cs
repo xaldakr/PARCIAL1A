@@ -21,8 +21,17 @@ namespace PARCIAL1A.Controllers
         [Route("GetAll")]
         public IActionResult Getto()
         {
-            List<post> listadopost = (from e in _ParcialContexto.Posts
-                                      select e).ToList();
+            var listadopost = (from e in _ParcialContexto.Posts
+                                      join a in _ParcialContexto.Autores
+                                         on e.AutorId equals a.Id
+                                      select new
+                                      {
+                                          e.Id,
+                                          e.Titulo,
+                                          e.Contenido,
+                                          e.FechaPublicacion,
+                                          a.Nombre
+                                      }).ToList();
             if (listadopost.Count() == 0)
             {
                 return NotFound();
@@ -34,9 +43,18 @@ namespace PARCIAL1A.Controllers
         [Route("GetById/{id}")]
         public IActionResult Get(int id)
         {
-            post? post = (from e in _ParcialContexto.Posts
-                          where e.Id == id
-                           select e).FirstOrDefault();
+            var post = (from e in _ParcialContexto.Posts
+                        join a in _ParcialContexto.Autores
+                           on e.AutorId equals a.Id
+                        where e.Id == id
+                        select new
+                        {
+                            e.Id,
+                            e.Titulo,
+                            e.Contenido,
+                            e.FechaPublicacion,
+                            a.Nombre
+                        }).FirstOrDefault();
             if (post == null)
             {
                 return NotFound();
@@ -100,6 +118,54 @@ namespace PARCIAL1A.Controllers
             _ParcialContexto.Posts.Remove(post);
             _ParcialContexto.SaveChanges();
             return Ok(post);
+        }
+        [HttpGet]
+        [Route("ListaPostbyAutor/{autor}")]
+        public IActionResult Findautor(string autor)
+        {
+            var listaPost = (from e in _ParcialContexto.Posts
+                             join a in _ParcialContexto.Autores
+                                on e.AutorId equals a.Id
+                             where a.Nombre.Contains(autor)
+                             select new
+                             {
+                                 e.Id,
+                                 e.Titulo,
+                                 e.Contenido,
+                                 e.FechaPublicacion,
+                                 a.Nombre
+                             }).OrderBy(result => result.FechaPublicacion).Take(20).ToList();
+            if (listaPost.Count() == 0)
+            {
+                return NotFound();
+            }
+            return Ok(listaPost);
+        }
+        [HttpGet]
+        [Route("ListaPostbyLibro/{libro}")]
+        public IActionResult Findlibro(string libro)
+        {
+            var listaPost = (from e in _ParcialContexto.Libros
+                             join ae in _ParcialContexto.AutorLibro
+                                on e.Id equals ae.LibroId
+                             join a in _ParcialContexto.Autores
+                                on ae.AutorId equals a.Id
+                             join tot in _ParcialContexto.Posts
+                                on a.Id equals tot.AutorId
+                             where e.Titulo.Contains(libro)
+                             select new
+                             {
+                                 tot.Id,
+                                 tot.Titulo,
+                                 tot.Contenido,
+                                 tot.FechaPublicacion,
+                                 a.Nombre,
+                             }).OrderBy(result => result.FechaPublicacion).ToList();
+            if (listaPost.Count() == 0)
+            {
+                return NotFound();
+            }
+            return Ok(listaPost);
         }
     }
 }

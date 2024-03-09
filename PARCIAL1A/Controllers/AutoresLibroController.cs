@@ -20,8 +20,16 @@ namespace PARCIAL1A.Controllers
         [Route("GetAll")]
         public IActionResult Getto()
         {
-            List<autorlibro> listadoautorlibro = (from e in _ParcialContexto.AutorLibro
-                                        select e).ToList();
+            var listadoautorlibro = (from e in _ParcialContexto.AutorLibro
+                                                  join a in _ParcialContexto.Autores
+                                                     on e.AutorId equals a.Id
+                                                  join l in _ParcialContexto.Libros
+                                                     on e.LibroId equals l.Id
+                                                    select new {
+                                                        a.Nombre,
+                                                        l.Titulo,
+                                                        e.Orden
+                                                    }).ToList();
             if (listadoautorlibro.Count() == 0)
             {
                 return NotFound();
@@ -33,9 +41,18 @@ namespace PARCIAL1A.Controllers
         [Route("GetByIdLibro/{id}")]
         public IActionResult GetLib(int id)
         {
-            autorlibro? autorlibro = (from e in _ParcialContexto.AutorLibro
-                            where e.LibroId == id
-                            select e).FirstOrDefault();
+            var autorlibro = (from e in _ParcialContexto.AutorLibro
+                                      join a in _ParcialContexto.Autores
+                                         on e.AutorId equals a.Id
+                                      join l in _ParcialContexto.Libros
+                                         on e.LibroId equals l.Id
+                                      where e.LibroId == id
+                                      select new
+                                      {
+                                          a.Nombre,
+                                          l.Titulo,
+                                          e.Orden
+                                      }).FirstOrDefault();
             if (autorlibro == null)
             {
                 return NotFound();
@@ -46,9 +63,18 @@ namespace PARCIAL1A.Controllers
         [Route("GetByIdAutor/{id}")]
         public IActionResult GetAutor(int id)
         {
-            autorlibro? autorlibro = (from e in _ParcialContexto.AutorLibro
+            var autorlibro = (from e in _ParcialContexto.AutorLibro
+                                      join a in _ParcialContexto.Autores
+                                         on e.AutorId equals a.Id
+                                      join l in _ParcialContexto.Libros
+                                         on e.LibroId equals l.Id
                                       where e.AutorId == id
-                                      select e).FirstOrDefault();
+                                      select new
+                                      {
+                                          a.Nombre,
+                                          l.Titulo,
+                                          e.Orden
+                                      }).FirstOrDefault();
             if (autorlibro == null)
             {
                 return NotFound();
@@ -119,12 +145,28 @@ namespace PARCIAL1A.Controllers
         }
 
         [HttpDelete]
-        [Route("Eliminar/{id}")]
-        public IActionResult Eliminarautorlibro(int id)
+        [Route("EliminarByAutor/{id}")]
+        public IActionResult EliminarautorlibroAu(int id)
         {
             autorlibro? autorlibro = (from e in _ParcialContexto.AutorLibro
-                            where e.Id == id
+                            where e.AutorId == id
                             select e).FirstOrDefault();
+            if (autorlibro == null)
+            {
+                return NotFound();
+            }
+            _ParcialContexto.AutorLibro.Attach(autorlibro);
+            _ParcialContexto.AutorLibro.Remove(autorlibro);
+            _ParcialContexto.SaveChanges();
+            return Ok(autorlibro);
+        }
+        [HttpDelete]
+        [Route("EliminarByLibro/{id}")]
+        public IActionResult EliminarautorlibroLib(int id)
+        {
+            autorlibro? autorlibro = (from e in _ParcialContexto.AutorLibro
+                                      where e.LibroId == id
+                                      select e).FirstOrDefault();
             if (autorlibro == null)
             {
                 return NotFound();

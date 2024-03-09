@@ -91,7 +91,7 @@ namespace PARCIAL1A.Controllers
             {
                 return NotFound();
             }
-
+            _ParcialContexto.Libros.Attach(libro);
             _ParcialContexto.Libros.Remove(libro);
             _ParcialContexto.SaveChanges();
 
@@ -103,18 +103,19 @@ namespace PARCIAL1A.Controllers
         [Route("BuscarPorAutor/{nombreAutor}")]
         public IActionResult BuscarPorAutor(string nombreAutor)
         {
-            List<libro> librosDelAutor = _ParcialContexto.Libros
-                .Join(_ParcialContexto.AutorLibro,
-                      libro => libro.Id,
-                      autorLibro => autorLibro.LibroId,
-                      (libro, autorLibro) => new { Libro = libro, AutorLibro = autorLibro })
-                .Join(_ParcialContexto.Autores,
-                      combined => combined.AutorLibro.AutorId,
-                      autor => autor.Id,
-                      (combined, autor) => new { combined.Libro, Autor = autor })
-                .Where(result => result.Autor.Nombre == nombreAutor)
-                .Select(result => result.Libro)
-                .ToList();
+
+            var librosDelAutor = (from e in _ParcialContexto.Libros
+                                  join ae in _ParcialContexto.AutorLibro
+                                   on e.Id equals ae.LibroId
+                                  join a in _ParcialContexto.Autores
+                                   on ae.AutorId equals a.Id
+                                  where a.Nombre.Contains(nombreAutor)
+                                  select new
+                                  {
+                                      e.Id,
+                                      e.Titulo,
+                                      a.Nombre
+                                  }).ToList();
 
             if (librosDelAutor.Count() == 0)
             {
