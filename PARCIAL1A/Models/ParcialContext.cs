@@ -8,7 +8,10 @@ namespace PARCIAL1A.Models
         {
 
         }
-        
+        public DbSet<autor> Autores { get; set; }
+        public DbSet<autorlibro> AutorLibro { get; set; }
+        public DbSet<post> Posts { get; set; }
+        public DbSet<libro> Libros { get; set; }
     }
 }
 
