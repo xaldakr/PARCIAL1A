@@ -1,0 +1,31 @@
+
+CREATE DATABASE PARCIAL1A;
+GO
+use PARCIAL1A;
+GO
+CREATE TABLE Autores (
+    Id INT PRIMARY KEY IDENTITY,
+    Nombre VARCHAR(50)
+);
+GO
+CREATE TABLE Libros (
+    Id INT PRIMARY KEY IDENTITY,
+    Titulo VARCHAR(50)
+);
+GO
+CREATE TABLE AutorLibro (
+    AutorId INT,
+    LibroId INT,
+    Orden INT,
+    FOREIGN KEY (AutorId) REFERENCES Autores(Id),
+    FOREIGN KEY (LibroId) REFERENCES Libros(Id)
+);
+GO
+CREATE TABLE Posts (
+    Id INT PRIMARY KEY IDENTITY,
+    Titulo VARCHAR(50),
+    Contenido VARCHAR(500),
+    FechaPublicacion DATETIME,
+    AutorId INT,
+    FOREIGN KEY (AutorId) REFERENCES Autores(Id)
+);
